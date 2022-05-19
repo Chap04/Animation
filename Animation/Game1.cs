@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+using System.Collections.Generic;
 
 namespace Animation
 {
@@ -22,13 +24,18 @@ namespace Animation
         Rectangle tribbleOrangeRect;
         Vector2 tribbleOrangeSpeed;
         Texture2D backgroundTexture;
-        float tribbleGreySpeedMultiplier;
+        List<Color> tribbleColourMaskList = new List<Color>() {Color.Red, Color.Blue, Color.Green, Color.LimeGreen, Color.Pink, Color.Purple, Color.Orange, Color.Yellow, Color.CornflowerBlue, Color.Indigo, Color.Aquamarine, Color.White, Color.Brown, Color.Black, Color.DeepSkyBlue, Color.Coral};
+        Random generator = new Random();
+        int generatorStored;
+        int tribbleBrownXLocation;
+        int randomLocation;
 
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            generatorStored = generator.Next(tribbleColourMaskList.Count);
         }
 
         protected override void Initialize()
@@ -39,7 +46,7 @@ namespace Animation
             _graphics.PreferredBackBufferHeight = 720;
             _graphics.ApplyChanges();
             tribbleGreySpeed = new Vector2(32, 0);
-            tribbleCreamSpeed = new Vector2(3, 9);
+            tribbleCreamSpeed = new Vector2(75, 1);
             tribbleBrownSpeed = new Vector2(0, 7);
             tribbleOrangeSpeed = new Vector2(20, 1);
 
@@ -56,9 +63,9 @@ namespace Animation
             tribbleCreamTexture = Content.Load<Texture2D>("tribbleCream");
             tribbleCreamRect = new Rectangle(300, 10, 100, 100);
             tribbleBrownTexture = Content.Load<Texture2D>("tribbleBrown");
-            tribbleBrownRect = new Rectangle(300, 10, 100, 100);
+            tribbleBrownRect = new Rectangle(300, 100, 100, 100);
             tribbleOrangeTexture = Content.Load<Texture2D>("tribbleOrange");
-            tribbleOrangeRect = new Rectangle(300, 10, 100, 100);
+            tribbleOrangeRect = new Rectangle(300, 100, 100, 100);
             backgroundTexture = Content.Load<Texture2D>("ruins");
         }
 
@@ -80,25 +87,35 @@ namespace Animation
 
             if (tribbleGreyRect.Right > _graphics.PreferredBackBufferWidth || tribbleGreyRect.X < 0)
             {
-                tribbleGreySpeed.X *= tribbleGreySpeedMultiplier;
                 tribbleGreySpeed.X *= -1;
                 
 
             }    
             if (tribbleGreyRect.Top < 0 || tribbleGreyRect.Bottom > _graphics.PreferredBackBufferHeight)
             {
-                tribbleGreySpeed.Y *= (float)1.05;
                 tribbleGreySpeed.Y *= -1;
             }
                 
             if (tribbleCreamRect.Right > _graphics.PreferredBackBufferWidth || tribbleCreamRect.X < 0)
+            {
                 tribbleCreamSpeed.X *= -1;
+                generatorStored = generator.Next(tribbleColourMaskList.Count);
+            }
+                
             if (tribbleCreamRect.Top < 0 || tribbleCreamRect.Bottom > _graphics.PreferredBackBufferHeight)
+            {
                 tribbleCreamSpeed.Y *= -1;
+                generatorStored = generator.Next(tribbleColourMaskList.Count);
+            }
+                
             if (tribbleBrownRect.Right > _graphics.PreferredBackBufferWidth || tribbleBrownRect.X < 0)
                 tribbleBrownSpeed.X *= -1;
             if (tribbleBrownRect.Top < 0 || tribbleBrownRect.Bottom > _graphics.PreferredBackBufferHeight)
-                tribbleBrownSpeed.Y *= -1;
+            {
+                tribbleBrownXLocation = generator.Next(_graphics.PreferredBackBufferWidth);
+                tribbleBrownRect = new Rectangle(tribbleBrownXLocation, 0, 100, 100);
+            }
+                
             if (tribbleOrangeRect.Right > _graphics.PreferredBackBufferWidth || tribbleOrangeRect.X < 0)
                 tribbleOrangeSpeed.X *= -1;
             if (tribbleOrangeRect.Top < 0 || tribbleOrangeRect.Bottom > _graphics.PreferredBackBufferHeight)
@@ -115,9 +132,10 @@ namespace Animation
             _spriteBatch.Begin();
             _spriteBatch.Draw(backgroundTexture, new Vector2(0, 0), Color.White);
             _spriteBatch.Draw(tribbleGreyTexture, tribbleGreyRect, Color.White);
-            _spriteBatch.Draw(tribbleCreamTexture, tribbleCreamRect, Color.White);
+            _spriteBatch.Draw(tribbleCreamTexture, tribbleCreamRect, tribbleColourMaskList[generatorStored]);
             _spriteBatch.Draw(tribbleBrownTexture, tribbleBrownRect, Color.White);
             _spriteBatch.Draw(tribbleOrangeTexture, tribbleOrangeRect, Color.White);
+            
 
 
             _spriteBatch.End();
